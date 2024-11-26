@@ -1,0 +1,56 @@
+/* 只需要重写你需要的即可 */
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': #08979c,
+    ),
+  ),
+  $text-color: (
+    'primary': #0D243E,
+    'regular': #424F61,
+    'placeholder': #A1B0BF,
+  ),
+  $border-color: (
+    'lighter': #DAE2EB,
+  ),
+  $header: (
+    'padding': '0',
+    'height': 48px,
+  ),
+  $table: (
+    'border': 0.25px solid #dae2eb,
+    'header-text-color': #0D243E,
+    'header-bg-color': #f5f7fa,
+  ),
+  $pagination: (
+    'font-color': #424F61,
+    'border-radius': 2px
+  ),
+  $dialog: (
+    'title-font-size': 16px,
+    'padding-primary': 24px,
+    'content-font-size': 14px,
+    'border-radius': 8px,
+  ),
+  $drawer: (
+    'padding-primary': 16px 24px,
+  ),
+  $transfer: (
+    'panel-width': 240px,
+  ),
+  $menu: (
+    'active-color': white,
+    'text-color': #bfcbd9,
+    'bg-color': #071a53,
+    'hover-bg-color': none,
+    'item-height': 40px,
+    'sub-item-height': 40px,
+    'horizontal-sub-item-height': 40px,
+    'border-color': none,
+    'icon-width': 16px,
+    'base-level-padding': 16px,
+    'level-padding': 24px,
+  )
+);
+
+@use "element-plus/theme-chalk/src/index.scss" as *;

@@ -1,0 +1,36 @@
+{
+  "name": "dd-account-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "patch-package && vite build",
+    "preview": "vite preview",
+    "prepare": "patch-package"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.0.9",
+    "@finv/watermark": "^1.0.5",
+    "@lcode/components-vue3": "^1.3.5",
+    "axios": "^0.27.2",
+    "clone": "^2.1.2",
+    "element-plus": "2.8.5",
+    "js-cookie": "^3.0.1",
+    "patch-package": "^8.0.0",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5",
+    "vuex": "^4.1.0",
+    "webphone.sdk": "^2.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-legacy": "^1.8.2",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "@vitejs/plugin-vue-jsx": "^1.3.10",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "sass": "^1.54.6",
+    "sass-loader": "^13.0.2",
+    "terser": "^5.19.4",
+    "vite": "^2.9.15"
+  }
+}

@@ -1,0 +1,36 @@
+#app {
+  .lib-table-row-color-hasCaseListing {
+    background-color: #F5F7FA;
+  }
+  .lib-table-row-color-grey {
+    background-color: #D9D9D9;
+  }
+}
+
+.lib-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: $title;
+}
+
+.lib-small-tabs {
+  .el-tabs__item {
+    height: 24px;
+    padding: 0 12px;
+    line-height: 1;
+  }
+}
+
+.lib-df-aic {
+  display: flex;
+  align-items: center;
+}
+
+.lib-notModal {
+  width: 0;
+  height: 0;
+  & > .el-overlay-dialog {
+    overflow: inherit;
+    height: 0;
+  }
+}

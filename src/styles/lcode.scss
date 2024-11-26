@@ -1,0 +1,58 @@
+.lib-lcode-tablePage-small {
+  .lcode-table {
+    .el-table .el-table__cell {
+      padding: 4.5px;
+      font-size: 12px;
+
+      .lcode-button .el-button {
+        font-size: 12px;
+      }
+      .cell {
+        padding: 0;
+      }
+    }
+  }
+  .pagination {
+    margin-top: 12px;
+  }
+  .body {
+    margin-top: 0;
+  }
+  &-notPage {
+    padding-bottom: 0;
+  }
+  &-notSearchForm {
+    .header {
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.lcode-table {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  .el-pagination.pagination {
+    float: none;
+  }
+}
+
+.el-dialog__body {
+  .tablePage {
+    .lcode-table {
+      .el-table .el-table__cell {
+        padding: 4.5px;
+        font-size: 12px;
+
+        .lcode-button .el-button {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+  .form .formItem {
+    .tablePage {
+      padding-bottom: 0;
+    }
+  }
+}

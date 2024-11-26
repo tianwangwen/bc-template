@@ -1,0 +1,9 @@
+#app {
+  .layout {
+    .el-menu--collapse {
+      min-height: calc(100% - 48px - 48px);
+      width: 60px;
+      transition: width 0.3s ease;
+    }
+  }
+}
