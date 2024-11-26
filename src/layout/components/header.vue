@@ -1,55 +1,68 @@
 <template>
-  <div class="header">
+  <el-header>
     <div class="left">
+      <div class="logo" />
+      <!-- {{ props.info.mediationCenterName }} -->
     </div>
     <div class="right">
-      <MessageList></MessageList>
+      <Message @new-msg-come="emit('new-msg-come')" />
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img src="../../assets/img/logo.png" class="user-avatar" />
-          <span class="user-name">{{ props.info.realName }}</span>
-          <el-icon>
-            <el-icon>
-              <ArrowDown />
-            </el-icon>
-          </el-icon>
+          <img src="@/assets/img/avatar.png" class="user-avatar" />
+          <span class="user-name">{{ props.info.userRealName }}</span>
+          <el-icon><ArrowDown /></el-icon>
         </div>
         <template #dropdown>
           <el-dropdown-menu class="user-dropdown">
-            <el-dropdown-item>
-              <span style="display: block" @click="logout">退出</span>
-            </el-dropdown-item>
+            <el-dropdown-item @click="onChangePwd">修改密码</el-dropdown-item>
+            <el-dropdown-item @click="onLogout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
-  </div>
+  </el-header>
 </template>
 
-
 <script setup>
-import { removeToken, login, clearTabs } from "@/utils/auth";
+import { onMounted } from 'vue'
 import { sensorsList } from '@/utils/sensors'
-import MessageList from "./message-list.vue";
+import Message from './message.vue'
+import { getFirstLogin } from '@/utils/auth'
 
-const props = defineProps({ info: Object });
-const logout = () => {
-  sensorsList.sfzc_logOut()
-  removeToken();
-  clearTabs();
-  login();
-};
+const emit = defineEmits(['new-msg-come'])
+
+const props = defineProps({ info: Object })
+const curtPath = window.location.href
+const onLogout = () => {
+  window.location.href = 'https://admin.huixtj.com/home?loginout=true'
+}
+
+// 修改密码跳转
+const onChangePwd = () => {
+  window.location.href = `https://admin.huixtj.com/login?returnUrl=${curtPath}&changepwd=true`
+}
+
+onMounted(() => {
+  const isFirstLogin =  getFirstLogin()
+  if (isFirstLogin == 'true') {
+    window.location.href = `https://admin.huixtj.com/login?returnUrl=${curtPath}&changepwd=true`
+  }
+})
 </script>
 
 <style lang="scss" scoped>
-.header {
+.el-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
-  background-color: white;
-  border-bottom: 1px solid $borderColor;
-
+  .logo {
+    height: 17px;
+    background-image: url(../../assets/img/logo.png);
+    background-size: 184px 17px;
+    background-position: 32px center;
+    background-repeat: no-repeat;
+    width: 220px;
+  }
   .avatar-container {
     .avatar-wrapper {
       display: flex;
@@ -67,7 +80,8 @@ const logout = () => {
 
       .user-name {
         margin-right: 8px;
-        font-weight: bold;
+        font-size: 14px;
+        color: #616b78;
       }
 
       .icon {
@@ -76,9 +90,23 @@ const logout = () => {
       }
     }
   }
+  .left {
+    display: flex;
+    line-height: $headerHeight;
+    color: #7b99c1;
+  }
   .right {
     display: flex;
     align-items: center;
+  }
+}
+
+@keyframes callRotate {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(45deg);
   }
 }
 </style>

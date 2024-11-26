@@ -1,102 +1,15 @@
 import clone from 'clone'
-import { useRoute } from 'vue-router'
-import store from '@/store'
-/*
-  将扁平数组通过 parentId 关联成树形结构
-    默认顶级 parentId 为0
-    默认关联子集的字段名为 children
-  @params list <Array>
-  @params label <String> 在树中展示字段
-  @params value <String> list item 中 parentId 指向的字段名
-  
-  例子：
-  原数据 = [
-    {
-      orgId: 1,
-      orgName: '信也',
-      parentId: 0,
-      status: true
-    },
-    {
-      orgId: 2,
-      orgName: '铂锌',
-      parentId: 0,
-      status: true
-    },
-    {
-      orgId: 3,
-      orgName: '业务中台',
-      parentId: 1,
-      status: true
-    }
-  ]
-
-  转化后 = [
-    {
-      orgId: 1,
-      orgName: '信也',
-      label: '信也',
-      parentId: 0,
-      status: true,
-      children: [
-        {
-          orgId: 3,
-          orgName: '业务中台',
-          label: '业务中台',
-          parentId: 1,
-          status: true
-        }
-      ]
-    },
-    {
-      orgId: 2,
-      orgName: '铂锌',
-      parentId: 0,
-      status: true,
-      children: []
-    },
-  ]
-*/
-export const findMinParentId = (data = []) => {
-  let minParentId = Infinity
-  data.forEach((item) => {
-    minParentId = minParentId > item.parentId ? item.parentId : minParentId
-  })
-  return minParentId || 0
-}
-
-export const handleListToTree = (list, label = 'name', value = 'id', parentId = 0) => {
-  const residueList = clone(list, false);
-  const tree = [];
-  const getChildList = (parentsList, residueList, parentId) => {
-    if (!residueList.length) return;
-    residueList.forEach((item, index) => {
-      if (parentId === item.parentId) {
-        const targetData = {
-          ...item,
-          label: item[label],
-          value: item[value],
-          children: [],
-        };
-        parentsList.push(targetData);
-        const r = clone(residueList, false);
-        r.splice(index, 1);
-        getChildList(targetData.children, r, item[value]);
-      }
-    })
-  };
-  getChildList(tree, residueList, parentId);
-  return tree;
-}
+import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus';
 
 // 将树结构转化为 list，通过 parentId 关联起来
 export const handleTreeToList = (tree, value = 'id', parentId = 0) => {
-  const residueTree = clone(tree, false);
-  const list = [];
+  const residueTree = clone(tree, false)
+  const list = []
   const forEachTree = (residueTree, parentId) => {
-    residueTree.forEach((item) => {
+    residueTree.forEach(item => {
       if (item.children && item.children.length) {
-        forEachTree(item.children, item[value]);
+        forEachTree(item.children, item[value])
       }
       const target = {
         ...item,
@@ -106,67 +19,156 @@ export const handleTreeToList = (tree, value = 'id', parentId = 0) => {
       list.push(target)
     })
   }
-  forEachTree(residueTree, parentId);
-  return list;
+  forEachTree(residueTree, parentId)
+  return list
 }
 
-// 从树结构中筛选出目标值，仍保留树结构
-export const filterTree = (tree, values, key = 'id', label = 'name') => {
-  const parentId = 0;
-  const list = handleTreeToList(tree, key)
-  const targetList = []
-  // const fn2 = (id) => {
-  //   const t = list.filter((i) => i.parentId === id)
-  //   if (!t || !t.length) return
-  //   targetList.push(...t)
-  //   t.forEach((item) => {
-  //     fn2(item.id)
-  //   })
-  // }
-  const fn = (id) => {
-    // fn2(id)
-    const t = list.find((i) => i[key] === id)
-    if (!t) return
-    if (t.parentId !== parentId) {
-      fn(t.parentId)
+export const getLastTowMonth = () => {
+  return [dayjs().subtract(60, 'd').format('YYYY-MM-DD 00:00:00'), dayjs().format('YYYY-MM-DD 23:59:59')]
+}
+
+export function getFileExtension(filename) {
+  const match = filename.match(/\.([^.]*)$/)
+  return match ? match[1] : ''
+}
+
+export const createUUId = (len, radix) => {
+  let chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('')
+  let uuid = []
+  let i = 0
+  let r = 0
+  radix = radix || chars.length
+  if (len) {
+    for (i = 0; i < len; i++) {
+      uuid[i] = chars[0 | (Math.random() * radix)]
     }
-    targetList.push(t)
-  }
-  values.forEach((item) => {
-    fn(item[key])
-  })
-  return handleListToTree([...new Set(targetList)], label, key)
-}
-
-export const clearTabs = () => {
-  localStorage.removeItem(TABSKEY)
-}
-
-export function formatNumberStripEndZero(amount, num) {
-  if (!amount) return amount
-  if (isNaN(Number(amount))) return amount
-  amount = num ? String(Number(amount).toFixed(num)) : String(amount)
-  let isNegative = amount.startsWith('-')
-  amount = isNegative ? amount.substring(1, amount.length) : amount
-  let iAmount = amount.split('.')[0]
-  let dAmount = amount.split('.')[1]
-  let reversedAmount = iAmount.split('').reverse()
-  let computedArr = []
-  for (let i = 0; i < reversedAmount.length; i++) {
-    computedArr.unshift(reversedAmount[i])
-    if (i % 3 === 2 && i !== reversedAmount.length - 1) {
-      computedArr.unshift(',')
+  } else {
+    uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-'
+    uuid[14] = '4'
+    for (i = 0; i < 36; i++) {
+      if (!uuid[i]) {
+        r = 0 | (Math.random() * 16)
+        uuid[i] = chars[i === 19 ? (r & 0x3) | 0x8 : r]
+      }
     }
   }
-  let returnStr = computedArr.join('') + (dAmount ? '.' + dAmount : '')
-  return isNegative ? '-' + returnStr : returnStr
+  return uuid.join('')
 }
 
-export const getScroll = () => {
-  const route = useRoute()
-  const scrollTop = store.state.app.scrollList[route.name] || 0;
-  const $content = document.querySelector(route.meta.scrollEl || '#main');
-  if (scrollTop && $content) {
-    $content.scrollTop = scrollTop;
+export const getLabel = (data, variables) => {
+  let result = data
+  if (typeof data === 'object') {
+    if (data.length && variables.length) {
+      result = data.map(x => variables.find(y => y.value === x)?.label).join(',')
+    }
+  } else if (typeof data === 'string' || typeof data === 'number') {
+    if (variables.length) {
+      result = variables.find(x => x.value === data)?.label
+    }
   }
+  return result
+}
+
+export function arrayDiff(a, b) {
+  return a.concat(b).filter(v => !a.includes(v) || !b.includes(v))
+}
+
+export function pwCheck(value) {
+  const length = value.length
+  return length >= 8 && length <= 12 && /\d+/g.test(value) && /[a-z]+/g.test(value) && /[A-Z]+/g.test(value) && /[@$!%*?&]/g.test(value) && !/\s/g.test(value)
+}
+
+export const copy = (value) => {
+    let inputEl = document.createElement('input');
+    document.body.appendChild(inputEl);
+    inputEl.setAttribute('value', value);
+    inputEl.select();
+    document.execCommand('copy');
+    ElMessage.success('复制成功');
+    inputEl.remove();
 };
+
+export const formatSeconds = (second) => {
+  let seconds = second / 1000;
+  let hours = Math.floor(seconds / 3600);
+  let minutes = Math.floor((seconds % 3600) / 60);
+  let remainingSeconds = seconds % 60;
+  let result = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + parseInt(remainingSeconds).toString().padStart(2, '0');
+  return result;
+};
+
+// 判断是否为图片
+export const isImage = fileName => {
+  return /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)$/.test(fileName.toLowerCase())
+}
+
+
+
+// 处理文件key和code关系
+export const KeyCode = {
+  idcardFront: 101,  // 身份证正面
+  idcardback: 102,  // 身份证反面
+  resume: 104,  // 简历
+  bankCardFront: 109, // 银行卡正面
+  bankCardback: 110, // 银行卡反面面
+  degreeCertificate: 103, // 学历证明
+  criminalRecord: 105, // 无犯罪证明
+  creditReport: 106, // 征信报告
+  mediatorCertificate: 107, // 调解员证书
+  healthExamination: 108, // 体检表
+  contract: 111,  // 合同
+  avatar: 301 // 头像
+}
+
+export const  educationLevelKeyCode = {
+  1: '博士研究生',
+  2: '硕士研究生',
+  3: '本科',
+  4: '专科',
+  5: '中专',
+  6: '高中',
+  7: '初中',
+  8: '小学',
+}
+
+export const  degreeLevelKeyCode = {
+  3: '博士',
+  2: '硕士',
+  1: '学士',
+  0: '无',
+}
+
+/*==========================离职资料=============================================== */
+// DIMISSION_CONFIRMATION_FORM(201, "离职申请确认表", DocumentTypeEnum.DIMISSION, true),
+// TERMINATION_AGREEMENT(202, "解除协议", DocumentTypeEnum.DIMISSION, true),
+// ATTENDANCE_CONFIRMATION(203, "考勤确认表", DocumentTypeEnum.DIMISSION, false),
+// DIMISSION_CERTIFICATE_STUB(204, "离职证明存根表", DocumentTypeEnum.DIMISSION, false),
+// DIMISSION_HANDOVER_FORM(205, "离职交接表", DocumentTypeEnum.DIMISSION, false)
+// CONTRACT(111, "合同", DocumentTypeEnum.ONBOARDING, true)
+
+export const dimissionKeyCode = {
+  confirmationOfDimissionApplication: 201, // 离职申请确认表
+  terminationOfAgreement: 202, // 解除协议
+  resignationCertificateStub: 204, // 离职证明存根表
+  healthCheckupForm: 203, // 体检表
+  handoverForm: 205, // 离职交接表
+}
+
+export function getFileNameFromURL(url) {
+  if (!url) return;
+  try {
+    const urlObject = new URL(url);
+
+    // 获取路径名部分
+    const pathname = urlObject.pathname;
+
+    // 从路径名中提取文件名（最后一个部分）
+    const fileName = pathname.split('/').pop();
+
+    return fileName;
+      // 创建一个 URL 对象
+  } catch (error) {
+      console.error('Invalid URL');
+      return undefined;
+  }
+}

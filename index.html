@@ -2,13 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>业务中台管理系统模板</title>
-    <script id="monitorJs" src="https://widgettool.ppdaicdn.com/10.6.3/online/ppdMonitor.js" data-params="method=get&url=/api/webuimonitor/monitorWebUiService/getDataReport&appId=1000005554"></script>
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <title>坐席管理系统</title>
+    <script id="monitorJs" src="//widgettool.ppdaicdn.com/10.6.3/online/ppdMonitor.js" data-params="method=get&appId=1000006168"></script>
     <script type="module">
-      var serverUrl = `https://sensorsdata.ppdai.com/sa/?project=${import.meta.env.VITE_APP_SA_TYPE}`
-      ;(function(para) {
+      var serverUrl = `//sensorsdata.ppdai.com/sa/?project=${import.meta.env.VITE_APP_SA_TYPE}`
+      ;(function (para) {
         var p = para.sdk_url,
           n = para.name,
           w = window,
@@ -19,8 +19,8 @@
         w['sensorsDataAnalytic201505'] = n
         w[n] =
           w[n] ||
-          function(a) {
-            return function() {
+          function (a) {
+            return function () {
               ;(w[n]._q = w[n]._q || []).push([a, arguments])
             }
           }
@@ -63,9 +63,9 @@
       })
 
       Sensors.registerPage({
-        product: 'cs_pc',
+        product: 'huixtj_pc',
         platform: 'PC',
-        user_agent: navigator.userAgent,
+        user_agent: navigator.userAgent
       })
       Sensors.quick('autoTrack')
     </script>

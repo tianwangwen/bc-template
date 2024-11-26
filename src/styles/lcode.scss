@@ -1,4 +1,9 @@
+.lib-tablePage-hasPage {
+  // padding-bottom: 70px;
+}
+
 .lib-lcode-tablePage-small {
+  // padding-bottom: 36px;
   .lcode-table {
     .el-table .el-table__cell {
       padding: 4.5px;
@@ -34,25 +39,77 @@
   justify-content: end;
   .el-pagination.pagination {
     float: none;
+    .el-input__inner {
+      font-size: 12px;
+    }
   }
 }
 
-.el-dialog__body {
-  .tablePage {
-    .lcode-table {
-      .el-table .el-table__cell {
-        padding: 4.5px;
-        font-size: 12px;
+.el-textarea {
+  .el-textarea__inner {
+    border-radius: 6px;
+    border: 1px solid rgba(220, 225, 229, 0.8);
+    box-shadow: none;
+  }
+  &.is-disabled .el-textarea__inner {
+    background-color: #f5f8fa;
+  }
+}
 
-        .lcode-button .el-button {
-          font-size: 12px;
-        }
+
+.tablePage {
+  .dialogs {
+    .confirm-content {
+      margin-left: -34px;
+    }
+    .el-dialog__footer {
+      padding: 0 24px 20px 24px;
+    }
+    .footer-btn {
+      .el-button {
+        border-radius: 6px;
       }
     }
   }
-  .form .formItem {
-    .tablePage {
-      padding-bottom: 0;
+  .horizontal > .lcode-form-item {
+    margin-right: 6px;
+    margin-bottom: 8px;
+  }
+  .button {
+    margin-right: 6px;
+  }
+}
+#app {
+  .lcode-table {
+    display: flex;
+    flex-wrap: wrap;
+    // justify-content: end;
+    .el-table__header, .el-table__body {
+      .el-table__cell {
+        &:first-child {
+          .cell {
+            padding-left: 32px;
+          }
+        }
+        .lcode-button {
+          line-height: 23px;
+          .is-link {
+            height: 14px;
+            line-height: 14px;
+          }
+        }
+      }
+    }
+    .el-pagination.pagination {
+      float: none;
+    }
+    .el-table__inner-wrapper {
+      &::before {
+        display: none;
+      }
+    }
+    tbody tr:last-child td {
+      border-bottom: var(--el-table-border);
     }
   }
 }

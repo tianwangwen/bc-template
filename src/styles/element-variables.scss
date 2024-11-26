@@ -2,55 +2,65 @@
 @forward 'element-plus/theme-chalk/src/common/var.scss' with (
   $colors: (
     'primary': (
-      'base': #08979c,
+      'base': #3487f4
     ),
+    'danger': (
+      'base': #ff4545
+    )
   ),
   $text-color: (
-    'primary': #0D243E,
-    'regular': #424F61,
-    'placeholder': #A1B0BF,
+    'primary': #002a3c,
+    'regular': #49596c,
+    'placeholder': #a1b0bf
   ),
   $border-color: (
-    'lighter': #DAE2EB,
+    'lighter': #f5f8fa
   ),
   $header: (
     'padding': '0',
-    'height': 48px,
+    'height': 66px
   ),
   $table: (
-    'border': 0.25px solid #dae2eb,
-    'header-text-color': #0D243E,
+    'border': 1px solid #f5f8fa,
+    'header-text-color': #002a3c,
     'header-bg-color': #f5f7fa,
+    'text-color': #49596c
   ),
   $pagination: (
-    'font-color': #424F61,
+    'font-color': #49596c,
     'border-radius': 2px
   ),
   $dialog: (
     'title-font-size': 16px,
     'padding-primary': 24px,
     'content-font-size': 14px,
-    'border-radius': 8px,
+    'border-radius': 8px
   ),
   $drawer: (
-    'padding-primary': 16px 24px,
+    'padding-primary': 16px 24px
   ),
   $transfer: (
-    'panel-width': 240px,
+    'panel-width': 240px
   ),
   $menu: (
     'active-color': white,
     'text-color': #bfcbd9,
-    'bg-color': #071a53,
+    'bg-color': #f1f4f9,
     'hover-bg-color': none,
-    'item-height': 40px,
-    'sub-item-height': 40px,
-    'horizontal-sub-item-height': 40px,
+    'item-height': 38px,
+    'sub-item-height': 36px,
+    'horizontal-sub-item-height': 36px,
     'border-color': none,
     'icon-width': 16px,
     'base-level-padding': 16px,
-    'level-padding': 24px,
+    'level-padding': 24px
+  ),
+  $button: (
+    'font-weight': normal
+  ),
+  $tabs: (
+    'header-height': 36px
   )
 );
 
-@use "element-plus/theme-chalk/src/index.scss" as *;
+@use 'element-plus/theme-chalk/src/index.scss' as *;

@@ -1,201 +1,125 @@
-import { sensorsList } from '@/utils/sensors'
+import { getLastTowMonth } from '@/utils/tools'
+import dayjs from 'dayjs'
 
-const columns = [
-  {
-    "prop": "kindName",
-    "label": "类别"
-  },
-  {
-    "prop": "typeName",
-    "label": "消息种类"
-  },
-  {
-    "label": "时间",
-    "prop": "updateTime"
-  },
-  {
-    "label": "内容",
-    "prop": "content",
-  }
-]
-
-const msgTypeOption = [
-  {
-    "label": "系统执行消息",
-    "value": 0
-  },
-  {
-    "label": "Q消息",
-    "value": 1
-  }
-]
-
-const typeOptions = [
-  {
-    "label": "批量修改owner",
-    "value": 2
-  },
-  {
-    "label": "自助分案",
-    "value": 18
-  },
-  {
-    "label": "案件指派",
-    "value": 19
-  },
-  {
-    "label": "Owner交换分配",
-    "value": 20
-  },
-  {
-    "label": "清空经办名下案件",
-    "value": 21
-  }
-]
-
-const typeOptions2 = [
-  {
-    "label": "Q消息",
-    "value": 17
-  },
-]
-
-const historyConfig = {
-  "apis": {
-    "searchApi": {
-      "method": "post",
-      "url": "/admin/getReadSysMsgList",
-      "handleParams"(params, data) {
+export default {
+  apis: {
+    searchApi: {
+      method: 'post',
+      url: '/admin/hrm/messageCenter/pageList',
+      handleParams(params) {
         return {
           ...params,
-          ...data,
-          ...this.$refs.tablePage.getSearchData(),
+          startTime: dayjs(params.startTime).format('YYYY-MM-DD 00:00:00'),
+          endTime: dayjs(params.endTime).format('YYYY-MM-DD 23:59:59'),
+          hasRead: this.pageNode.unreadOnly.value ? 0 : 1,
+          mediateCenterId: 0,
+          appId: 0,
+          seatsId: 0,
         }
+      },
+      handleResult(result) {
+        const data = result.code === 0 ? (result.result || {}).data || [] : []
+        if (data.filter(x => x.hasRead === 0).length) {
+          this.sendApi(
+            {
+              url: '/admin/hrm/messageCenter/read',
+              success() {
+                this.sendApi({
+                  url: '/admin/hrm/messageCenter/unreadCount',
+                  success(result) {
+                    if (result.code === 0) {
+                      this.$store.commit('app/setMessageNum', result.result.unReadCount || 0)
+                    }
+                  }
+                })
+              }
+            },
+            {
+              ids: data.filter(x => x.hasRead === 0).map(x => x.id)
+            }
+          )
+        }
+        return result
       }
     }
   },
-  "tableConfig": {
-    "columns": columns,
-    "pagination": {
-      "notPagination": false,
-      "size": "small"
-    },
-    "config": {}
+  tableConfig: {
+    columns: [
+      {
+        prop: 'msgTypeDesc',
+        label: '消息种类',
+        colType: 'jsx',
+        jsx(h, { row }) {
+          return <span className={row.hasRead === 0 ? 'msg-unread' : ''}>{row.msgTypeDesc}</span>
+        }
+      },
+      {
+        prop: 'content',
+        label: '消息类型',
+        colType: 'jsx',
+        jsx(h, { row }) {
+          return <span className='msg-content' v-html={row.content} />
+        }
+      },
+      {
+        prop: 'inserttime',
+        label: '消息时间'
+      }
+    ],
+    config: {
+      other: {
+        height: 'calc(100vh - 270px)'
+      }
+    }
   },
-  "forms": {
-    "searchForm": {
-      "key": "searchForm",
-      "data": [
+  buttons: {},
+  forms: {
+    searchForm: {
+      formItemWidth: 120,
+      key: 'searchForm',
+      data: [
         {
-          "key": "msgType",
-          "data": {
-            "placeholder": "类别",
-            "options": msgTypeOption
-          },
-          "type": "Select",
+          key: 'content',
+          data: {
+            placeholder: '消息内容',
+            clearable: true
+          }
         },
         {
-          "key": "type",
-          "data": {
-            "placeholder": "消息种类",
-            "options": typeOptions
+          key: 'msgTypes',
+          type: 'Select',
+          data: {
+            placeholder: '消息种类',
+            clearable: true,
+            multiple: true,
+            collapseTags: true,
+            collapseTagsTooltip: true,
+            style: {
+              width: '200px'
+            }
           },
-          "type": "Select",
-          "subscribe": {
-            "key": "msgType",
-            "match": value => value !== undefined,
-            "success": ["clear", function (value, subscriber) {
-              if (value === 0) {
-                subscriber.data.options = typeOptions
-              } else if (value === 1) {
-                subscriber.data.options = typeOptions2
-              }
-            }],
-            "error": "clear"
+          getOptionsFromVariables: {
+            variableKey: 'msgTypeVariable'
+          }
+        },
+        {
+          label: '消息时间',
+          useFormItemConfig: 'datetimerange',
+          data: {
+            value: getLastTowMonth(),
+            'start-placeholder': '开始日期',
+            'end-placeholder': '结束日期',
+            type: 'daterange',
+            'value-format': 'YYYY-MM-DD',
+            style: {
+              width: '260px'
+            }
           }
         }
       ]
     }
   },
-  "buttons": {
-    "searchButton": {
-      "useButtonConfig": "searchButton",
-      "beforeAction"(data) {
-        sensorsList.sfzc_message_history_search(data.type ? this.searchForm.getFormItem('type').data.options.find((item) => item.value === data.type).label : undefined)
-        return true
-      }
-    }
-  },
-  "buttonGroup": [
-    "searchButton"
-  ],
-}
-
-export const config = {
-  "apis": {
-    "searchApi": {
-      "method": "post",
-      "url": "/admin/getUnReadSysMsgList",
-      "handleResult"(result) {
-        if (result.code === 0 && result.result.length)
-        this.sendApi({
-          "url": "/admin/updateSysMsgForRead",
-          "success"() {
-            this.sendApi({
-              "url": "/admin/sysMessageRemind",
-              "success"(result) {
-                if (result.code === 0) {
-                  this.$store.commit('app/setNotifyNum', result.result.count || 0)
-                }
-              }
-            })
-          }
-        }, {
-          "msgIds": result.result.map((item) => item.msgId)
-        })
-        return result
-      }
-    }
-  },
-  "tableConfig": {
-    "columns": columns,
-    "pagination": {
-      "notPagination": true
-    },
-    "config": {}
-  },
-  "forms": {
-    "searchForm": {
-      "formItemWidth": 120,
-      "labelType": "Search",
-      "key": "searchForm",
-      "data": []
-    }
-  },
-  "buttonGroup": [
-    "historyButton"
-  ],
-  "buttons": {
-    "historyButton": {
-      "key": "historyButton",
-      "label": "历史消息",
-      "type": "primary",
-      "actionType": "dialog",
-      "dialogKey": "historyDialog",
-      "beforeAction"() {
-        sensorsList.sfzc_message_history()
-        return true
-      }
-    }
-  },
-  "dialogs": {
-    "historyDialog": {
-      "key": "historyDialog",
-      "title": "历史消息",
-      "type": "table",
-      "width": "1000px",
-      "showSubmit": false,
-      "prop": historyConfig
-    }
-  }
+  buttonGroup: ['searchButton'],
+  dialogs: {},
+  variables: {}
 }

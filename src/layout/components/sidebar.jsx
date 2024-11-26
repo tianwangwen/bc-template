@@ -1,6 +1,3 @@
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import { sensorsList } from '@/utils/sensors'
-
 export default {
   name: 'Sidebar',
   props: ['data'],
@@ -9,20 +6,12 @@ export default {
       await this.$router.push({
         path: data.index
       })
-      sensorsList.sfzc_navigation_subMenu.call(this)
-    },
-    openSubMenu(data) {
-      sensorsList.sfzc_navigation_priMenu(data)
     }
   },
-  computed: {
-    isCollapse() {
-      return !this.$store.state.app.sidebarOpened
-    }
-  },
+  computed: {},
   data() {
     return {
-      defaultIndex: this.$route.path,
+      defaultIndex: this.$route.path
     }
   },
   watch: {
@@ -30,61 +19,61 @@ export default {
       this.defaultIndex = this.$route.path
     }
   },
+  mounted() {
+    // this.$store.dispatch('app/getWarningNum')
+  },
   render() {
-    const MenuItem = ({ meta = {}, path, code }) => {
+    const MenuIcon = ({ name }) => {
+      return <span class={'menu-icon menu-icon-' + name} />
+    }
+
+    const MenuItem = ({ meta = {}, path }) => {
       const icon = meta.icon
-      const IconNode = ElementPlusIconsVue[icon]
       return (
-        <el-menu-item class={[`menu-code-${code}`]} onClick={this.changeRouter} index={path}>
+        <el-menu-item onClick={this.changeRouter} index={path}>
+          {icon ? (
+            <el-icon>
+              <MenuIcon name={icon} />
+            </el-icon>
+          ) : null}
+          {meta.title}
           {
-            icon ? <el-icon><IconNode /></el-icon> : null
+            (path === '/real-time-warning' && !!this.$store.state.app.warningNum) && <div class="tagNum"><p>{this.$store.state.app.warningNum > 99 ? '99+' : this.$store.state.app.warningNum}</p></div>
           }
-          { this.isCollapse && meta.collapseTitle === false ? '' : meta.title}
         </el-menu-item>
       )
     }
-    const SubMenuItem = (data) => {
+    const SubMenuItem = data => {
       if (!data.children || !data.children.length) {
         return <MenuItem {...data}></MenuItem>
       } else {
         return (
-          <el-sub-menu class={[`menu-code-${data.code}`]} index={data.path}>
+          <el-sub-menu index={data.path}>
             {{
               title: () => {
                 const icon = data.meta.icon
-                const IconNode = ElementPlusIconsVue[icon]
                 return (
-                  <div className={[`menu-code-${data.code}`]}>
-                    {
-                      icon ? <el-icon><IconNode /></el-icon> : null
-                    }
-                    {this.isCollapse ? '' : data.meta.title}
+                  <div>
+                    {icon ? (
+                      <el-icon>
+                        <MenuIcon name={icon} />
+                      </el-icon>
+                    ) : null}
+                    {data.meta.title}
                   </div>
                 )
               },
-              default: () => (
-                data.children.map((i) => (
-                  <SubMenuItem {...i}></SubMenuItem>
-                ))
-              )
+              default: () => data.children.map(i => <SubMenuItem {...i}></SubMenuItem>)
             }}
           </el-sub-menu>
         )
       }
     }
     return (
-      <el-menu
-        default-active={this.defaultIndex}
-        collapse={this.isCollapse}
-        router
-        onOpen={this.openSubMenu}
-        class="el-menu-vertical-demo slider-menu"
-      >
-        {
-          this.data.map((item) => {
-            return <SubMenuItem {...item}></SubMenuItem>
-          })
-        }
+      <el-menu default-active={this.defaultIndex} collapse={false} router class={'slider-menu'}>
+        {this.data.map(item => {
+          return <SubMenuItem {...item}></SubMenuItem>
+        })}
       </el-menu>
     )
   }

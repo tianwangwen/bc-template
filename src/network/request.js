@@ -50,23 +50,22 @@ export class Request {
           fullscreen: true
         })
       }
-      let reponse;
+      let reponse
       if (this.contentType === 'form-data') {
         const formData = new FormData()
-        Object.keys(this.params).forEach((item) => {
+        Object.keys(this.params).forEach(item => {
           formData.append(item, this.params[item])
         })
-        formData.append('business', 'customer')
-        reponse = (await axios({
+        reponse = await axios({
           headers: {
             'Content-Type': 'multipart/form-data;charset=UTF-8'
           },
           url: this.url,
           method: this.method,
           data: formData
-        }).catch((e) => {
+        }).catch(e => {
           throw e
-        }))
+        })
       } else {
         const dataKey = this.method === 'post' ? 'data' : 'params'
         const params = {
@@ -75,9 +74,9 @@ export class Request {
           method: this.method,
           ...this.other
         }
-        reponse = (await axios(params).catch((e) => {
+        reponse = await axios(params).catch(e => {
           throw e
-        }))
+        })
       }
       const code = reponse?.code
       if (code === 0) {
@@ -87,7 +86,9 @@ export class Request {
           data = reponse.result
         }
       } else {
-        if (this.needMessage) {
+        if (this.needReponseAll) {
+          data = reponse
+        } else if (this.needMessage) {
           ElMessage.error((reponse && reponse.message) || '接口错误，请联系管理员')
         }
       }

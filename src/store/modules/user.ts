@@ -1,75 +1,81 @@
 import UserApi from '@/api/user'
-import { getToken, setToken, login, clearTabs } from '@/utils/auth'
+import { getToken, login, removeToken } from '@/utils/auth'
 import router from '@/router'
 import { handleTreeToList } from '@/utils/tools'
 import { createWatermark } from '@/utils/watermark'
+import dayjs from 'dayjs'
 
 const state = {
   token: getToken(),
   info: {
-    id: 12,
-    realName: ' '
+    id: null,
+    mediationCenterId: null,
+    permissions: []
   },
-  menuTree: []
+  menuLoad: false,
+  menuTree: [],
+  perms: []
 }
 
 const mutations = {
-  SET_TOKEN: (state, token) => {
-    state.token = token
-  },
   SET_INFO: (state, info) => {
-    state.info = info
+    state.info = { ...state.info, ...info }
+  },
+  SET_MENU_LOAD: (state, payload) => {
+    state.menuLoad = payload
   },
   SET_MENU_TREE: (state, payload) => {
     state.menuTree = payload
   },
+  SET_PERMS: (state, payload) => {
+    state.perms = payload
+  }
 }
 
 const actions = {
-  async login({ commit }, userInfo) {
-    const data = await UserApi.login(userInfo)
-    if (!data) return
-    commit('SET_TOKEN', data)
-    setToken(data)
-    return data
-  },
-  async getInfo({ commit }) {
+  async getInfo({ commit, dispatch }) {
     const data = await UserApi.getInfo()
     if (!data) {
-      clearTabs()
+      removeToken()
       return login()
     }
-    createWatermark(data.realName)
-    commit('SET_INFO', data)
-    window.Sensors.login(data.userId)
+    createWatermark(data.userCode + dayjs().format('YYYY/MM/DD'))
+    await commit('SET_INFO', data)
   },
-  async getMenuTree({ commit }) {
-    const data = await UserApi.getMenuTree()
+  async getUserMenu({ commit }) {
+    const { id, mediationCenterId } = state.info
+    const data = await UserApi.queryUserMenu({ mediateCenterId: mediationCenterId, systemUserId: id })
     if (!data) return
-    let menus = []
+
+    const menus = []
+    const perms = []
     const { routes } = router.options
     const routesList = handleTreeToList(routes)
-    if (data[0] && data[0].value.menuCode === 'DD_STP_ROOT') {
-      data[0].children.forEach((permMenu) => {
-        let children = []
-        const localRoute = routesList.find((item) => item.code === permMenu.value.menuCode) || {}
-        permMenu.children.forEach(subMenu => {
+    if (data[0] && data[0].menuCode === 'HRM_ROOT') {
+      data[0].children.forEach(permMenu => {
+        const children = []
+        ;(permMenu.children || []).forEach(subMenu => {
+          const innerLocalRoute = routesList.find(item => item.meta?.code === subMenu.menuCode) || {}
           children.push({
-            name: subMenu.value.menuName,
-            path: subMenu.value.menuUri,
-            code: subMenu.value.menuCode,
-            meta: { title: subMenu.value.menuName },
+            name: subMenu.menuName,
+            path: subMenu.menuUri || innerLocalRoute.path,
+            meta: { title: subMenu.menuName, code: subMenu.menuCode }
           })
+          perms.push(subMenu.menuCode)
         })
+
+        const localRoute = routesList.find(item => item.meta?.code === permMenu.menuCode) || {}
         menus.push({
-          name: permMenu.value.menuName,
-          path: permMenu.value.menuUri || localRoute.path,
-          meta: { ...localRoute.meta, title: permMenu.value.menuName, icon: localRoute.meta?.icon },
-          code: permMenu.value.menuCode,
-          children: [].concat(children),
+          name: permMenu.menuName,
+          path: permMenu.menuUri || localRoute.path,
+          meta: { ...localRoute.meta, title: permMenu.menuName, code: permMenu.menuCode, icon: localRoute.meta?.icon },
+          children: [].concat(children)
         })
+        perms.push(permMenu.menuCode)
       })
+      commit('SET_MENU_LOAD', true)
       commit('SET_MENU_TREE', menus)
+      commit('SET_PERMS', perms)
     }
     return menus
   }

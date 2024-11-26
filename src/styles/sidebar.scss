@@ -1,9 +1,28 @@
 #app {
   .layout {
     .el-menu--collapse {
-      min-height: calc(100% - 48px - 48px);
+      min-height: calc(100% - 48px);
       width: 60px;
       transition: width 0.3s ease;
+    }
+    .el-menu-item {
+      position: relative;
+      .tagNum {
+        position: absolute;
+        right: 0;
+        min-width: 15px;
+        height: 12px;
+        background-color: #3487F4;
+        color: white;
+        border-radius: 0 6px 6px 4px;
+        text-align: center;
+        line-height: 12px;
+        font-weight: bold;
+        p {
+          font-size: 12px;
+          transform: scale(0.833);
+        }
+      }
     }
   }
 }
