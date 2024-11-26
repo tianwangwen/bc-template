@@ -20,6 +20,9 @@ export default defineConfig({
   parserOptions: {
     sourceType: 'module'
   },
+  optimizeDeps: {
+    include: ['@lcode/components-utils', 'axios', 'clone', 'dayjs', '@lcode/components-vue3']
+  },
   resolve: {
     alias: {
       '@': pathResolve('src'),
